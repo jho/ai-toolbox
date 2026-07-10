@@ -3,19 +3,25 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: install.sh [--target PATH]
+Usage: install.sh [--surface codex|claude|PATH] [--target PATH]
 
-Install the toolbox skills into a Codex skills directory.
+Install the toolbox skills into a Codex or Claude skills directory.
 
 Defaults:
-  --target  $CODEX_HOME/skills or ~/.codex/skills
+  --surface codex   -> $CODEX_HOME/skills or ~/.codex/skills
+  --surface claude  -> $CLAUDE_HOME/skills or ~/.claude/skills
 EOF
 }
 
 target_root=""
+surface=""
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
+    --surface)
+      shift
+      surface="${1:-}"
+      ;;
     --target)
       shift
       target_root="${1:-}"
@@ -34,10 +40,20 @@ while [ "$#" -gt 0 ]; do
 done
 
 if [ -z "$target_root" ]; then
-  target_root="${CODEX_HOME:-$HOME/.codex}/skills"
+  case "${surface:-codex}" in
+    codex)
+      target_root="${CODEX_HOME:-$HOME/.codex}/skills"
+      ;;
+    claude)
+      target_root="${CLAUDE_HOME:-$HOME/.claude}/skills"
+      ;;
+    *)
+      printf 'Unknown surface: %s\n' "$surface" >&2
+      exit 1
+      ;;
+  esac
 fi
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 "$repo_root/scripts/sync-codex-skills.sh" "$target_root"
-

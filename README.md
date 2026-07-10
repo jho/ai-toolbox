@@ -39,7 +39,8 @@ See [skills/README.md](skills/README.md) for the current skill index.
 
 ## Install
 
-Run `./install.sh` to sync the repo's skills into the current Codex skills directory.
+Run `./install.sh` to sync the repo's skills into the current Codex or Claude skills directory.
+For curlable installs, use `./bootstrap.sh` from a cloned copy or a raw-file wrapper.
 
 ## Principles
 
