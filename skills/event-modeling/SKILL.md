@@ -7,7 +7,9 @@ description: >-
   to event-model a business process or system, do event modeling / event storming, design slices,
   build or edit an `.em` model, or run the em tool. Works in resumable phases via an argument:
   `discover` (steps 1-4), `model` (steps 5-7), `slice` (deep slice specs), plus `watch` and
-  `validate`. With no argument it resumes from the saved state file.
+  `validate`. With no argument it resumes from the saved state file. Supports an interactive
+  interview mode that asks one focused question at a time and stops with the render location once
+  the model is renderable unless the user asks to continue.
 ---
 
 # Event Modeling with `em`
@@ -26,6 +28,8 @@ Read `reference/methodology.md` (the 7 steps + 4 patterns) and `reference/em-dsl
   be-true/how-do-you-know" over yes-no.
 - **Don't guess - park it.** Unresolved items go into the Open Questions list in
   `.event-modeling.md`, not into invented model content.
+- **Stop at renderable.** Once enough information exists to render a useful model, render it and
+  return the render location. Continue only when the user explicitly asks for more model work.
 - **Reflect and re-render.** After each meaningful increment, update the `.em` file, re-render,
   and show the user what changed. Encourage running the live view (`watch`) so a team can follow.
 - **Keep the `.em` structural; put depth in `note` docs.** The diagram holds flow; invariants,
@@ -76,8 +80,9 @@ Goal: a draft model of events, storyboard, commands, and views. Loose is OK; str
    `from "Event"` (State View pattern).
 
 End of phase: write or refresh the `.em`, render it, update `.event-modeling.md` (steps done,
-decisions, open questions, slice inventory). Tell the user they can stop here and resume with
-`/event-modeling model`.
+decisions, open questions, slice inventory). If the model is renderable, return the render
+location and stop unless the user asks to continue. Tell the user they can stop here and resume
+with `/event-modeling model`.
 
 ## Phase: `model` - steps 5-7
 
@@ -98,6 +103,8 @@ Goal: a structurally complete, validated model with correct patterns and swimlan
    an event directly.
 
 End of phase: render, update state, suggest `/event-modeling slice` to write implementation specs.
+If the model is renderable and the user has not asked for deeper work, return the render
+location and stop.
 
 ## Phase: `slice` - deep slice documents
 
@@ -150,3 +157,15 @@ em watch <name>.em -o <name>.svg
 Always finish a working session by re-rendering, running `em validate`, and updating
 `.event-modeling.md` with the current phase, step, decisions, and open questions.
 
+## Interactive interview mode
+
+When the user is exploring a new model:
+
+1. Ask one question.
+2. Update the model from the answer.
+3. Re-render as soon as the model is meaningful enough to see.
+4. If the model renders cleanly, report the render location and stop unless the user asks for the
+   next question or a deeper phase.
+
+Prefer short, focused prompts that move the model forward without forcing the user to answer a
+long questionnaire.

@@ -12,7 +12,7 @@ for skill_dir in "$repo_root"/skills/*; do
   skill_name="$(basename "$skill_dir")"
   dest_dir="$target_root/$skill_name"
   mkdir -p "$dest_dir"
-  rsync -rL --delete --exclude '.DS_Store' "$skill_dir/" "$dest_dir/"
+  cp -R -X "$skill_dir"/. "$dest_dir"/
 done
 
 printf 'Synced skills from %s to %s\n' "$repo_root/skills" "$target_root"
