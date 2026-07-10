@@ -19,10 +19,6 @@ The initial role model is intentionally compressed:
 - `tester`
 - `release-manager`
 
-The first mirrored skill is `event-modeling`, adapted to stay generic and reusable.
-
-The role definitions are designed to align with the agentic SDLC model in `~/dev/architecture`, while staying generic enough to reuse outside that repo.
-
 ## Repo layout
 
 ```text
@@ -41,12 +37,15 @@ See [skills/README.md](skills/README.md) for the current skill index.
 
 Run `./install.sh` to sync the repo's skills into the current Codex or Claude skills directory.
 
-Examples:
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/jho/ai-toolbox/main/install.sh)"
+```
+
+To install to a specific surface from a cloned repo:
 
 ```bash
 ./install.sh --surface codex
 ./install.sh --surface claude
-AI_TOOLBOX_REPO_REF=main /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/jho/ai-toolbox/main/install.sh)"
 ```
 
 ## Principles
