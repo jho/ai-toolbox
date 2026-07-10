@@ -41,7 +41,7 @@ Run `./install.sh` to sync the repo's skills into the current Codex or Claude sk
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/jho/ai-toolbox/main/install.sh)"
 ```
 
-To install to a specific surface from a cloned repo:
+To force a specific surface from a cloned repo:
 
 ```bash
 ./install.sh --surface codex

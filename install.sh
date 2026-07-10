@@ -6,11 +6,12 @@ repo_ref="${AI_TOOLBOX_REPO_REF:-main}"
 
 usage() {
   cat <<'EOF'
-Usage: install.sh [--surface codex|claude] [--target PATH]
+Usage: install.sh [--surface auto|codex|claude] [--target PATH]
 
 Install the toolbox skills into a Codex or Claude skills directory.
 
 Defaults:
+  --surface auto    -> prefer Codex when ~/.codex exists, otherwise Claude when ~/.claude exists
   --surface codex   -> $CODEX_HOME/skills or ~/.codex/skills
   --surface claude  -> $CLAUDE_HOME/skills or ~/.claude/skills
 
@@ -20,7 +21,7 @@ EOF
 }
 
 target_root=""
-surface="codex"
+surface="auto"
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -53,6 +54,19 @@ install_from_repo() {
 
 resolve_target_root() {
   case "$1" in
+    auto)
+      if [ -n "${CODEX_HOME:-}" ] && [ -d "${CODEX_HOME:-}" ]; then
+        printf '%s\n' "${CODEX_HOME}/skills"
+      elif [ -d "$HOME/.codex" ]; then
+        printf '%s\n' "$HOME/.codex/skills"
+      elif [ -n "${CLAUDE_HOME:-}" ] && [ -d "${CLAUDE_HOME:-}" ]; then
+        printf '%s\n' "${CLAUDE_HOME}/skills"
+      elif [ -d "$HOME/.claude" ]; then
+        printf '%s\n' "$HOME/.claude/skills"
+      else
+        printf '%s\n' "${CODEX_HOME:-$HOME/.codex}/skills"
+      fi
+      ;;
     codex)
       printf '%s\n' "${CODEX_HOME:-$HOME/.codex}/skills"
       ;;
