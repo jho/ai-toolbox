@@ -36,6 +36,6 @@ Own problem framing, outcome definition, and scope control for a feature or init
 
 ## Handoffs
 
+- To `creating-prd` to turn an initiative into a structured PRD.
 - To `architect` for solution shaping.
 - To `planner` after product intent is clear.
-
