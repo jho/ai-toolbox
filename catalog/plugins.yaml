@@ -1,0 +1,46 @@
+version: 1
+items:
+  - name: em
+    kind: skill
+    description: Vendored event modeling tool and skill
+    surfaces:
+      - codex
+      - claude
+    source:
+      type: subtree
+      path: vendor/em
+      upstream: https://github.com/milehimikey/em.git
+      ref: main
+    install:
+      command: ai-toolbox update
+      note: Build the vendored subtree and install the em CLI.
+    update:
+      command: ./scripts/upgrade-em.sh
+      note: Pull the upstream subtree snapshot into vendor/em.
+    dependencies:
+      - node
+    status: vendored
+    notes:
+      - First non-marketplace example in the catalog.
+  - name: toolbox-catalog-manager
+    kind: plugin
+    description: AI-managed catalog plugin for skills and plugins
+    surfaces:
+      - codex
+      - claude
+    source:
+      type: local
+      path: plugins/toolbox-catalog-manager
+    install:
+      codex:
+        command: codex plugin add toolbox-catalog-manager@personal
+        note: Requires the plugin to be published into a Codex marketplace.
+      claude:
+        command: claude plugin install toolbox-catalog-manager
+        note: Uses the Claude plugin install flow when available.
+    update:
+      command: ai-toolbox update
+      note: Refresh local skills and dependency hooks after catalog edits.
+    status: source
+    notes:
+      - Example plugin for managing this catalog via AI.

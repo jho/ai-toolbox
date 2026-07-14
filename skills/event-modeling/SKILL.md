@@ -39,8 +39,10 @@ Read `reference/methodology.md` (the 7 steps + 4 patterns) and `reference/em-dsl
 
 ## Preconditions (run first)
 
-1. Check the tool: `em --version`. If missing, tell the user to run `npm i -g @milehimikey/em`
-   and stop until installed.
+1. Check the tool: `em --version`. If missing, tell the user to run `ai-toolbox update`
+   first so the vendored subtree in `vendor/em` can be built and installed. If you are working
+   with the upstream skill outside this repo, use `npm i -g @milehimikey/em` directly and stop
+   until installed.
 2. Locate the model. Look for an existing `<dir>/.event-modeling.md` and `*.em` in the working
    directory (or a `models/` subfolder). If found, read the state file. If not, and the phase
    needs one, ask the user for the model name and where to create it.

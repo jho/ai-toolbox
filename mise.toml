@@ -1,0 +1,8 @@
+[tasks.sync]
+run = "./scripts/sync-codex-skills.sh"
+
+[tasks.deps]
+run = "./scripts/run-deps.sh"
+
+[tasks.upgrade-em]
+run = "./scripts/upgrade-em.sh"

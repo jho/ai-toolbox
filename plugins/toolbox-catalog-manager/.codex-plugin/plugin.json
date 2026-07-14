@@ -1,0 +1,24 @@
+{
+  "name": "toolbox-catalog-manager",
+  "version": "0.1.0",
+  "description": "Manage the ai-toolbox catalog of skills, plugins, vendored tools, and install flows",
+  "author": {
+    "name": "jho"
+  },
+  "license": "MIT",
+  "keywords": [
+    "catalog",
+    "plugins",
+    "skills",
+    "codex",
+    "claude"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Toolbox Catalog Manager",
+    "shortDescription": "Add and manage AI tools in a catalog",
+    "longDescription": "Tracks skills, plugins, vendored tools, and install/update flows across Codex and Claude.",
+    "developerName": "jho",
+    "category": "Productivity"
+  }
+}
