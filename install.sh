@@ -243,10 +243,14 @@ if [ -z "$target_root" ]; then
   target_root="$(resolve_target_root "$surface")"
 fi
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+script_source="${BASH_SOURCE[0]:-}"
+script_dir=""
+if [ -n "$script_source" ]; then
+  script_dir="$(cd "$(dirname "$script_source")" && pwd)"
+fi
 installed_command_dir="$command_dir"
 
-if [ -f "$script_dir/scripts/sync-codex-skills.sh" ]; then
+if [ -n "$script_dir" ] && [ -f "$script_dir/scripts/sync-codex-skills.sh" ]; then
   install_from_repo "$script_dir" "$target_root"
   install_deps "$script_dir"
   install_command "$script_dir" "$installed_command_dir"
