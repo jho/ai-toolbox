@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_url="${AI_TOOLBOX_REPO_URL:-https://github.com/jho/dev-toolbox.git}"
-repo_ref="${AI_TOOLBOX_REPO_REF:-main}"
-command_name="${AI_TOOLBOX_COMMAND_NAME:-dev-toolbox}"
-command_dir="${AI_TOOLBOX_COMMAND_DIR:-$HOME/.local/bin}"
+repo_url="${DEV_TOOLBOX_REPO_URL:-${AI_TOOLBOX_REPO_URL:-https://github.com/jho/dev-toolbox.git}}"
+repo_ref="${DEV_TOOLBOX_REPO_REF:-${AI_TOOLBOX_REPO_REF:-main}}"
+command_name="${DEV_TOOLBOX_COMMAND_NAME:-${AI_TOOLBOX_COMMAND_NAME:-dev-toolbox}}"
+command_dir="${DEV_TOOLBOX_COMMAND_DIR:-${AI_TOOLBOX_COMMAND_DIR:-$HOME/.local/bin}}"
 legacy_command_name="${DEV_TOOLBOX_LEGACY_COMMAND_NAME:-ai-toolbox}"
+state_dir="${DEV_TOOLBOX_STATE_DIR:-${AI_TOOLBOX_STATE_DIR:-$HOME/.local/share/dev-toolbox}}"
 
 usage() {
   cat <<'EOF'
@@ -19,12 +20,16 @@ Defaults:
   --surface claude  -> $CLAUDE_HOME/skills or ~/.claude/skills
 
 If run outside a cloned checkout, the script clones the dev-toolbox repo into a temporary directory
-and installs from there. Override the remote with AI_TOOLBOX_REPO_URL and AI_TOOLBOX_REPO_REF.
+and installs from there. Override the remote with DEV_TOOLBOX_REPO_URL and DEV_TOOLBOX_REPO_REF
+(or the legacy AI_TOOLBOX_* names).
 Use --verify to print the installed skill directories after syncing.
 
-The installer also drops a small `dev-toolbox` command into $AI_TOOLBOX_COMMAND_DIR
-by default, plus an `ai-toolbox` compatibility alias. Use `dev-toolbox update` to resync
-skills without returning to the repo.
+The installer also drops a small `dev-toolbox` command into $DEV_TOOLBOX_COMMAND_DIR by
+default, plus an `ai-toolbox` compatibility alias. Use `dev-toolbox update` to resync skills
+without returning to the repo.
+
+It also writes a small shell contract to `~/.local/share/dev-toolbox/`
+so private dotfiles can source a stable PATH/env fragment without depending on the repo layout.
 EOF
 }
 
@@ -67,6 +72,29 @@ install_from_repo() {
 install_deps() {
   local repo_root="$1"
   "$repo_root/scripts/run-deps.sh"
+}
+
+install_shell_contract() {
+  local contract_dir="$1"
+  local command_dir="$2"
+
+  mkdir -p "$contract_dir" "$command_dir"
+
+  cat >"$contract_dir/env.sh" <<EOF
+# Managed by dev-toolbox install.sh.
+export DEV_TOOLBOX_STATE_DIR="$contract_dir"
+export DEV_TOOLBOX_COMMAND_DIR="$command_dir"
+EOF
+
+  cat >"$contract_dir/path.sh" <<EOF
+# Managed by dev-toolbox install.sh.
+_dev_toolbox_path="$(printf '%s' "\${PATH}" | awk -v RS=: -v ORS=: -v dir="$command_dir" '
+  $0 != dir && length($0) { print }
+')"
+_dev_toolbox_path="\${_dev_toolbox_path%:}"
+export PATH="$command_dir\${_dev_toolbox_path:+:\${_dev_toolbox_path}}"
+unset _dev_toolbox_path
+EOF
 }
 
 install_command() {
@@ -139,10 +167,10 @@ run_sync() {
   workdir="\$(mktemp -d)"
   trap 'rm -rf "\$workdir"' EXIT
 
-  git clone --depth 1 --branch "\$repo_ref" "\$repo_url" "\$workdir/ai-toolbox" >/dev/null 2>&1
-  "\$workdir/ai-toolbox/scripts/\$script_name" "\$target_root"
-  if [ -f "\$workdir/ai-toolbox/scripts/run-deps.sh" ]; then
-    "\$workdir/ai-toolbox/scripts/run-deps.sh"
+  git clone --depth 1 --branch "\$repo_ref" "\$repo_url" "\$workdir/dev-toolbox" >/dev/null 2>&1
+  "\$workdir/dev-toolbox/scripts/\$script_name" "\$target_root"
+  if [ -f "\$workdir/dev-toolbox/scripts/run-deps.sh" ]; then
+    "\$workdir/dev-toolbox/scripts/run-deps.sh"
   fi
 }
 
@@ -222,6 +250,7 @@ if [ -f "$script_dir/scripts/sync-codex-skills.sh" ]; then
   install_from_repo "$script_dir" "$target_root"
   install_deps "$script_dir"
   install_command "$script_dir" "$installed_command_dir"
+  install_shell_contract "$state_dir" "$installed_command_dir"
   if [ "$verify" = "true" ]; then
     printf 'Installed skills:\n'
     list_installed_skills "$target_root"
@@ -242,10 +271,11 @@ fi
 workdir="$(mktemp -d)"
 trap 'rm -rf "$workdir"' EXIT
 
-git clone --depth 1 --branch "$repo_ref" "$repo_url" "$workdir/ai-toolbox"
-install_from_repo "$workdir/ai-toolbox" "$target_root"
-install_deps "$workdir/ai-toolbox"
-install_command "$workdir/ai-toolbox" "$installed_command_dir"
+git clone --depth 1 --branch "$repo_ref" "$repo_url" "$workdir/dev-toolbox"
+install_from_repo "$workdir/dev-toolbox" "$target_root"
+install_deps "$workdir/dev-toolbox"
+install_command "$workdir/dev-toolbox" "$installed_command_dir"
+install_shell_contract "$state_dir" "$installed_command_dir"
 if [ "$verify" = "true" ]; then
   printf 'Installed skills:\n'
   list_installed_skills "$target_root"

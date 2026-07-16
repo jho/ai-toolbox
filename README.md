@@ -68,8 +68,10 @@ After install, use:
 dev-toolbox update
 ```
 
-You can override the helper install location with `AI_TOOLBOX_COMMAND_DIR`.
-Make sure `~/.local/bin` appears before `/opt/homebrew/bin` in the shell Codex uses so the
+You can override the helper install location with `DEV_TOOLBOX_COMMAND_DIR`
+or the legacy `AI_TOOLBOX_COMMAND_DIR`.
+The installer also writes shell fragments under `~/.local/share/dev-toolbox/`; private dotfiles
+can source those to prepend `~/.local/bin` ahead of Homebrew and other system bins so the
 toolbox-installed `em` is the one that gets picked up.
 
 The repo uses `mise` for task orchestration around sync and subtree updates.
